@@ -1,0 +1,5 @@
+image:
+  repository: dodaharsha/cd-app
+  tag: latest
+service:
+  port: 3000

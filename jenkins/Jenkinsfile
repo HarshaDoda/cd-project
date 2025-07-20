@@ -2,20 +2,20 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'your-dockerhub/cd-app'
+        IMAGE_NAME = 'dodaharsha/cd-app'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/<your-username>/cd-project.git'
+                git 'https://github.com/HarshaDoda/cd-project.git'
             }
         }
 
         stage('Install Dependencies') {
             steps {
                 dir('app') {
-                    sh 'npm install'
+                    bat 'npm install'
                 }
             }
         }
@@ -23,7 +23,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 dir('app') {
-                    sh 'npm test'
+                    bat 'npm test'
                 }
             }
         }
@@ -31,7 +31,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 dir('app') {
-                    sh "docker build -t $IMAGE_NAME ."
+                    bat "docker build -t %IMAGE_NAME% ."
                 }
             }
         }
@@ -40,15 +40,17 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
                         usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                    sh "docker push $IMAGE_NAME"
+                    bat '''
+                    echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+                    docker push %IMAGE_NAME%
+                    '''
                 }
             }
         }
 
         stage('Deploy via Helm') {
             steps {
-                sh "helm upgrade --install myapp ./helm/myapp --set image.repository=$IMAGE_NAME"
+                bat 'helm upgrade --install myapp ./helm/myapp --set image.repository=%IMAGE_NAME%'
             }
         }
     }

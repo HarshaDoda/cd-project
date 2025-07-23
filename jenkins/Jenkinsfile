@@ -55,12 +55,12 @@ pipeline {
         }
     }
 
-    post {
-        success {
-            slackSend(channel: '#devops-alerts', message: "✅ Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
-        }
-        failure {
-            slackSend(channel: '#devops-alerts', message: "❌ Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
-        }
-    }
+    // post {
+    //     success {
+    //         slackSend(channel: '#devops-alerts', message: "✅ Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+    //     }
+    //     failure {
+    //         slackSend(channel: '#devops-alerts', message: "❌ Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+    //     }
+    // }
 }

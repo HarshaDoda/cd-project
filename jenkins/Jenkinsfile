@@ -13,7 +13,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn clean install'
+                bat 'mvn clean install'
             }
         }
 
@@ -24,7 +24,7 @@ pipeline {
             steps {
                 // "My SonarQube" must match the SonarQube server name in Jenkins config
                 withSonarQubeEnv('My SonarQube') {
-                    sh """
+                    bat """
                         mvn sonar:sonar \
                           -Dsonar.projectKey=sonar_harsha_project \
                           -Dsonar.host.url=http://192.168.1.39:9002 \

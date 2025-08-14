@@ -1,13 +1,13 @@
 pipeline {
     agent any
     tools {
-        maven 'Maven 3.9.6'       // Ensure this matches Jenkins Maven tool name
-        jdk 'JDK 17'              // Ensure this matches Jenkins JDK tool name
+        maven 'Maven mvnd'       // Ensure this matches Jenkins Maven tool name
+        jdk 'JDK 21'              // Ensure this matches Jenkins JDK tool name
     }
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/<your-username>/<your-repo>.git'
+                git branch: 'main', url: 'https://github.com/HarshaDoda/cd-project.git'
             }
         }
         stage('Build') {
@@ -23,7 +23,7 @@ pipeline {
                 withSonarQubeEnv('My SonarQube') {
                     sh """
                         mvn sonar:sonar \
-                          -Dsonar.projectKey=<your-project-key> \
+                          -Dsonar.projectKey=sonar_harsha_project \
                           -Dsonar.host.url=http://localhost:9002 \
                           -Dsonar.login=$SONARQUBE
                     """

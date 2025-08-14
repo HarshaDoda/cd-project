@@ -1,8 +1,8 @@
 pipeline {
     agent any
     tools {
-        maven 'Maven mvnd'       // Ensure this matches Jenkins Maven tool name
-        jdk 'JDK 21'              // Ensure this matches Jenkins JDK tool name
+        maven 'Maven mvnd'   // Must match the Maven name in Jenkins Global Tool Config
+        jdk 'JDK 21'         // Must match the JDK name in Jenkins Global Tool Config
     }
     stages {
         stage('Checkout') {
@@ -10,16 +10,19 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/HarshaDoda/cd-project.git'
             }
         }
+
         stage('Build') {
             steps {
                 sh 'mvn clean install'
             }
         }
+
         stage('SonarQube Analysis') {
             environment {
-                SONARQUBE = credentials('sonarqube-token') // Token stored in Jenkins credentials
+                SONARQUBE = credentials('sonarqube-token') // Store token in Jenkins credentials
             }
             steps {
+                // "My SonarQube" must match the SonarQube server name in Jenkins config
                 withSonarQubeEnv('My SonarQube') {
                     sh """
                         mvn sonar:sonar \
@@ -30,6 +33,7 @@ pipeline {
                 }
             }
         }
+
         stage('Quality Gate') {
             steps {
                 timeout(time: 1, unit: 'HOURS') {
@@ -39,70 +43,3 @@ pipeline {
         }
     }
 }
-
-// pipeline {
-//     agent any
-
-//     environment {
-//         IMAGE_NAME = 'dodaharsha/cd-app'
-//     }
-
-//     stages {
-//         stage('Checkout') {
-//             steps {
-//                 git branch: 'main', url: 'https://github.com/HarshaDoda/cd-project.git'
-//             }
-//         }
-
-//         stage('Install Dependencies') {
-//             steps {
-//                 dir('app') {
-//                     bat 'npm install'
-//                 }
-//             }
-//         }
-
-//         stage('Run Tests') {
-//             steps {
-//                 dir('app') {
-//                     bat 'npm test'
-//                 }
-//             }
-//         }
-
-//         stage('Build Docker Image') {
-//             steps {
-//                 dir('app') {
-//                     bat "docker build -t %IMAGE_NAME% ."
-//                 }
-//             }
-//         }
-
-//         stage('Push Image') {
-//             steps {
-//                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
-//                         usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-//                     bat '''
-//                     echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
-//                     docker push %IMAGE_NAME%
-//                     '''
-//                 }
-//             }
-//         }
-
-//         stage('Deploy via Helm') {
-//             steps {
-//                 bat 'helm upgrade --install myapp ./helm/myapp --set image.repository=%IMAGE_NAME%'
-//             }
-//         }
-//     }
-
-//     // post {
-//     //     success {
-//     //         slackSend(channel: '#devops-alerts', message: "✅ Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
-//     //     }
-//     //     failure {
-//     //         slackSend(channel: '#devops-alerts', message: "❌ Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
-//     //     }
-//     // }
-// }
